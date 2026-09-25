@@ -1,4 +1,4 @@
-module cloudsync-decrypt-go
+module github.com/yeyu/cloudsync-decrypt
 
 go 1.22
 

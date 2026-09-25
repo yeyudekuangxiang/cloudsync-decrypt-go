@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"cloudsync-decrypt-go/csenc"
+	"github.com/yeyu/cloudsync-decrypt/csenc"
 )
 
 // vectorsRoot is the local path to a clone of marnix/synology-decrypt.

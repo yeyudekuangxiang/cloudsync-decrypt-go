@@ -27,6 +27,13 @@ type Options struct {
 	// PrivateKey is used to unwrap enc_key2 via RSA-OAEP(SHA-1).
 	PrivateKey *rsa.PrivateKey
 
+	// OnMetadata, if non-nil, is invoked once with a stable snapshot of
+	// the metadata parsed so far, immediately before the first payload
+	// byte is emitted.  Metadata that only appears after the payload
+	// (notably file_md5) is not yet present at that point; it is still
+	// verified internally when the stream ends.
+	OnMetadata func(*Metadata)
+
 	// Logger receives non-fatal diagnostics such as unknown metadata
 	// fields or algorithm mismatches that are not treated as errors.
 	Logger func(format string, args ...interface{})
@@ -90,6 +97,10 @@ func Decrypt(in io.Reader, out io.Writer, opt Options) error {
 			if pipe == nil {
 				if err := meta.checkModes(); err != nil {
 					return err
+				}
+				if opt.OnMetadata != nil {
+					snap := *meta
+					opt.OnMetadata(&snap)
 				}
 				sessionKey, err := recoverSessionKey(opt, meta.EncKey1, meta.EncKey2,
 					meta.Salt, meta.Key1Hash, meta.SessionKeyHash, meta.Major)
